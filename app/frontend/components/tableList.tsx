@@ -7,6 +7,31 @@ interface TableListProps {
   type: "movies" | "books";
 }
 
+interface Month {
+  name: string;  // "Jan", "Feb", dll
+  value: string; // "01", "02", dll
+}
+
+const MONTHS: Month[] = [
+  { name: "Jan", value: "01" },
+  { name: "Feb", value: "02" },
+  { name: "Mar", value: "03" },
+  { name: "Apr", value: "04" },
+  { name: "May", value: "05" },
+  { name: "Jun", value: "06" },
+  { name: "Jul", value: "07" },
+  { name: "Aug", value: "08" },
+  { name: "Sep", value: "09" },
+  { name: "Oct", value: "10" },
+  { name: "Nov", value: "11" },
+  { name: "Dec", value: "12" },
+]
+
+function getMonthValue(name: string): number | undefined {
+  const month = MONTHS.find((m) => m.name.toLowerCase() === name.toLowerCase());
+  return month ? Number(month.value) : undefined;
+}
+
 const ITEMS_PER_PAGE = 15;
 
 export default function TableList({ data = [], type }: TableListProps) {
@@ -32,16 +57,20 @@ export default function TableList({ data = [], type }: TableListProps) {
         const raw = type === "movies" ? item.date_x : item.published_date;
         if (raw) {
           let dateParts;
+          let newDate;
           if (type === "movies") {
             // MM/DD/YYYY format
             dateParts = raw.split("/");
-            return dateParts.length === 3 ? new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`).getTime() : 0;
+            newDate = new Date(`${dateParts[2].trim()}-${dateParts[0]}-${dateParts[1]}`);
+            return dateParts.length === 3 ? newDate : 0;
           } else if (type === "books") {
             // "Sep 12, 2025" format
             const match = raw.match(/(\w+)\s+(\d+),\s+(\d+)/);
             if (match) {
-              const month = new Date(`${match[1]} 1`).getMonth() + 1; // Get month number
-              return new Date(`${match[3]}-${month}-${match[2]}`).getTime();
+              const monthValue = getMonthValue(match[1])?.toString().padStart(2, '0');
+              const dayValue = match[2].padStart(2, '0');
+              const newDate = new Date(`${match[3]}-${monthValue}-${dayValue}`);
+              return newDate;
             }
           }
         }
