@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useWishlist } from "@/app/context/WishlistContext";
 
 interface TableListProps {
   data: any[];
@@ -37,6 +38,7 @@ const ITEMS_PER_PAGE = 15;
 export default function TableList({ data = [], type }: TableListProps) {
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("date");
+  const { addToWishlist, isInWishlist } = useWishlist();
 
   useEffect(() => {
     setPage(1);
@@ -45,24 +47,26 @@ export default function TableList({ data = [], type }: TableListProps) {
   const sortedData = useMemo(() => {
     const pickValue = (item: any) => {
       if (sortBy === "rating") {
-        const raw = type === "movies" ? item.score : item.rating;
+        const raw = type === "movies" ? item.vote_average : item.rating;
         const num = Number(raw);
         return Number.isFinite(num) ? num : -Infinity;
       }
       if (sortBy === "title") {
-        const raw = type === "movies" ? item.names : item.title;
+        const raw = type === "movies" ? item.title : item.title;
         return raw ? String(raw).toLowerCase() : "";
       }
       if (sortBy === "date") {
-        const raw = type === "movies" ? item.date_x : item.published_date;
+        const raw = type === "movies" ? item.release_date : item.published_date;
         if (raw) {
           let dateParts;
           let newDate;
           if (type === "movies") {
-            // MM/DD/YYYY format
-            dateParts = raw.split("/");
-            newDate = new Date(`${dateParts[2].trim()}-${dateParts[0]}-${dateParts[1]}`);
-            return dateParts.length === 3 ? newDate : 0;
+            // // YYYY-MM-DD format
+            // dateParts = raw.split("-");
+            // console.log(dateParts);
+            newDate = new Date(raw);
+            console.log(newDate);
+            return newDate;
           } else if (type === "books") {
             // "Sep 12, 2025" format
             const match = raw.match(/(\w+)\s+(\d+),\s+(\d+)/);
@@ -78,7 +82,7 @@ export default function TableList({ data = [], type }: TableListProps) {
       }
     }
 
-    return [...data].sort((a, b) => {
+    return data.map((item, index) => ({ ...item, originalIndex: index })).sort((a, b) => {
       const va = pickValue(a);
       const vb = pickValue(b);
 
@@ -116,17 +120,17 @@ export default function TableList({ data = [], type }: TableListProps) {
         <button
           onClick={goPrev}
           disabled={page === 1}
-          className="rounded-lg bg-[#47f7fc] px-4 py-2 text-base font-medium text-black transition-all hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="rounded-lg bg-[#7dd3fc] px-4 py-2 text-base font-medium text-white transition-all hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           Prev
         </button>
-        <span className="text-base   text-gray-500">
+        <span className="text-base   text-gray-500">  
           {pagedData.length} of {data.length} items
         </span>
         <button
           onClick={goNext}
           disabled={page === totalPages}
-          className="rounded-lg bg-[#47f7fc] px-4 py-2 text-base font-medium text-black transition-all hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="rounded-lg bg-[#7dd3fc] px-4 py-2 text-base font-medium text-white transition-all hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           Next
         </button>
@@ -162,15 +166,34 @@ export default function TableList({ data = [], type }: TableListProps) {
               <th className="border border-black-400 p-2">Date Released</th>
               <th className="border border-black-400 p-2">Genre</th>
               <th className="border border-black-400 p-2">Rating</th>
+              <th className="border border-black-400 p-2">Action</th>
             </tr>
           </thead>
           <tbody>
             {pagedData.map((item, index) => (
               <tr key={index}>
-                <td className="border border-gray-400 p-2">{item.names}</td>
-                <td className="border border-gray-400 p-2">{item.date_x}</td>
+                <td className="border border-gray-400 p-2">{item.title}</td>
+                <td className="border border-gray-400 p-2">{item.release_date}</td>
                 <td className="border border-gray-400 p-2">{item.genre || "-"}</td>
-                <td className="border border-gray-400 p-2">{item.score || "-"}</td>
+                <td className="border border-gray-400 p-2">{item.vote_average || "-"}</td>
+                <td className="border border-gray-400 p-2 text-center">
+                  <button
+                    onClick={() => {
+                      addToWishlist({
+                        id: item.id,
+                        type: "movie",
+                        title: item.names || "Untitled",
+                        description: item.overview || "No description",
+                        author: item.crew || "Unknown",
+                        ...item,
+                      });
+                    }}
+                    disabled={isInWishlist(item.id, "movie")}
+                    className="rounded bg-[#7dd3fc] px-2 py-2 text-white text-sm font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {isInWishlist(item.id, "movie") ? "Added" : "Add to Wishlist"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -191,6 +214,7 @@ export default function TableList({ data = [], type }: TableListProps) {
               <th className="border border-black-400 p-2">Author</th>
               <th className="border border-black-400 p-2">Date Released</th>
               <th className="border border-black-400 p-2">Rating</th>
+              <th className="border border-black-400 p-2">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -200,6 +224,24 @@ export default function TableList({ data = [], type }: TableListProps) {
                 <td className="border border-gray-400 p-2">{item.author || "-"}</td>
                 <td className="border border-gray-400 p-2">{item.published_date || "-"}</td>
                 <td className="border border-gray-400 p-2">{item.rating || "-"}</td>
+                <td className="border border-gray-400 p-2 text-center">
+                  <button
+                    onClick={() => {
+                      addToWishlist({
+                        id: item.FIELD1,
+                        type: "book",
+                        title: item.title || "Untitled",
+                        description: item.description || "No description",
+                        author: item.author || "Unknown",
+                        ...item,
+                      });
+                    }}
+                    disabled={isInWishlist(item.FIELD1, "book")}
+                    className="rounded bg-[#7dd3fc] px-2 py-2 text-white text-sm font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {isInWishlist(item.FIELD1, "book") ? "Added" : "Add to Wishlist"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

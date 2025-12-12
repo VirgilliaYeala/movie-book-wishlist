@@ -16,11 +16,20 @@ export default function Tabs() {
         const booksResponse = await fetch("/data/books.json");
         
         const movies = await moviesResponse.json();
-
         const books = await booksResponse.json();
         
-        setMoviesData(movies);
-        setBooksData(books);
+        // Remove duplicates from movies based on title (names)
+        const uniqueMovies = movies.filter((movie: any, index: number, self: any[]) =>
+          index === self.findIndex((m: any) => m.title === movie.title)
+        );
+
+        // Remove duplicates from books based on title (names)
+        const uniqueBooks = books.filter((book: any, index: number, self: any[]) =>
+          index === self.findIndex((b: any) => b.title === book.title)
+        );
+        
+        setMoviesData(uniqueMovies);
+        setBooksData(uniqueBooks);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
