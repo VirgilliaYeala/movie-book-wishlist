@@ -19,7 +19,7 @@ export default function Tabs() {
           onClick={() => setActiveTab("tab1")}
           className={`px-4 py-2 font-semibold ${
             activeTab === "tab1"
-              ? "border-b-2 border-[#ff8000] text-black"
+              ? "border-b-2 border-[#85b1ee] text-[#364c84]"
               : "text-gray-600"
           }`}
         >
@@ -29,7 +29,7 @@ export default function Tabs() {
           onClick={() => setActiveTab("tab2")}
           className={`px-4 py-2 font-semibold ${
             activeTab === "tab2"
-              ? "border-b-2 border-[#ff8000] text-black"
+              ? "border-b-2 border-[#85b1ee] text-[#364c84]"
               : "text-gray-600"
           }`}
         >

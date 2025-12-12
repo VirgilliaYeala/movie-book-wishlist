@@ -17,7 +17,7 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Header */}
-				<div className={`px-8 py-7 bg-[#ff8000]`}>
+				<div className={`px-8 py-7 bg-[#364c84] border-b border-gray-200`}>
 					<div className="flex items-start justify-between">
 						<div className="flex-1">
 							<h1 className="text-3xl font-bold text-white mb-1">
@@ -62,7 +62,7 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 								<h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
 									{cardType === "movie" ? "Overview" : "Description"}
 								</h3>
-								<p className="text-lg leading-relaxed text-gray-700">
+								<p className="text-lg leading-relaxed text-[#364c84]">
 									{cardType === "movie" 	
 										? (item.overview || "No overview available")
 										: (item.description || "No description available")
@@ -80,7 +80,7 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 										{item.genre.split(",").map((g: string, i: number) => (
 											<span
 												key={i}
-												className="rounded-full bg-[#7dd3fc] px-4 py-1 text-base font-semibold text-white"
+												className="rounded-full bg-[#e7f1a8] px-4 py-1 text-base font-semibold text-[#364c84]"
 											>
 												{g.trim()}
 											</span>
@@ -98,7 +98,7 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 										{item.generes.split(",").map((g: string, i: number) => (
 											<span
 												key={i}
-												className="rounded-full bg-[#7dd3fc] px-4 py-1 text-base font-semibold text-white"
+												className="rounded-full bg-[#e7f1a8] px-4 py-1 text-base font-semibold text-[#364c84]"
 											>
 												{g.trim()}
 											</span>
@@ -113,7 +113,7 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 							<h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
 								{cardType === "movie" ? "Details" : "Book Information"}
 							</h3>
-							<div className={`space-y-3 rounded-lg p-6 bg-gray-50`}>
+							<div className={`space-y-3 rounded-lg p-6 bg-[#85b1ee]/10`}>
 								{cardType === "movie" ? (
 									<>
 										{item.original_language && (
@@ -154,10 +154,10 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 				</div>
 
 				{/* Footer */}
-				<div className={`px-8 py-4 border-t flex justify-end gap-3 bg-gray-50 border-gray-200`}>
+				<div className={`px-8 py-4 border-t flex justify-end gap-3 bg-[#85b1ee]/10 border-[#85b1ee]/30`}>
 					<button
 						onClick={onClose}
-						className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+						className="px-3 py-2 rounded-lg bg-[#85b1ee]/50 text-[#364c84] font-semibold hover:bg-[#85b1ee]/70 transition"
 					>
 						Close
 					</button>
@@ -170,8 +170,8 @@ export default function Modal({ isOpen, onClose, item, cardType }: ModalProps) {
 function DetailRow({ label, value, type }: { label: string; value: string; type: "movie" | "book" }) {
 	return (
 		<div className={`flex justify-between border-b pb-2 border-gray-200`}>
-			<span className="font-medium text-gray-600">{label}:</span>
-			<span className="text-right font-semibold text-gray-900">{value}</span>
+			<span className="font-medium text-[#364c84]">{label}:</span>
+			<span className="text-right font-semibold text-[#364c84]">{value}</span>
 		</div>
 	);
 }
